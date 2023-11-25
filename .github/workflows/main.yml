@@ -1,0 +1,22 @@
+name: Download File from Baidu Cloud
+
+on: [push]
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+    - name: Download file
+      run: |
+        python main.py  # Replace with the name of your Python script
+    - name: Upload file
+      uses: actions/upload-artifact@v2
+      with:
+        name: downloaded-file
+        path: 齐善鸿讲《道德经》.7z  # Replace with the name of the downloaded file
