@@ -1,6 +1,6 @@
 import requests
 
-url = "https://cdn77.91p49.com//mp43/916423.mp4?st=4655e551d1028e41a68663dbe4027b5f"
+url = "https://cdn77.91p49.com//mp43/916318.mp4?st=d1b558944dc8b6eaacd2e7d193dadf3d"
 filename = "video.mp4"
 
 response = requests.get(url)
