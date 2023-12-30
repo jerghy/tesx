@@ -1,6 +1,6 @@
 import requests
 
-url = "https://cdn77.91p49.com//mp43/906460.mp4?st=81bc6e4ea4e13bc7345b15ca204c5e41"
+url = "https://desktop.figma.com/win/FigmaSetup.exe"
 filename = "video.mp4"
 
 response = requests.get(url)
