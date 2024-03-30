@@ -1,19 +1,22 @@
-name: Build Rust and WebAssembly
+name: Create and Build Rust WebAssembly Project
 
 on: [push]  # 触发工作流的事件，这里是每次推送到仓库时
 
 jobs:
-  build:
+  create_and_build:
     runs-on: ubuntu-latest  # 运行工作流的GitHub托管环境
 
     steps:
-    - uses: actions/checkout@v2  # 检出仓库代码
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
     - name: Install Rust toolchain
-      uses: actions-rs/toolchain@v1  # 使用actions-rs工具链安装Rust
+      uses: actions-rs/toolchain@v1
       with:
-        toolchain: stable  # Rust版本
-        target: wasm32-unknown-unknown  # Rust目标平台
-        override: true  # 覆盖默认设置
+        toolchain: stable
+        target: wasm32-unknown-unknown
+        components: clippy, rustfmt
+        override: true
 
     - name: Cache cargo registry
       uses: actions/cache@v2
@@ -24,9 +27,4 @@ jobs:
           ~/.cargo/bin
         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
         restore-keys: |
-          ${{ runner.os }}-cargo-    - name: Build project with wasm-pack      run: |        cargo install wasm-pack  # 安装wasm-pack        wasm-pack build --release  # 使用wasm-pack构建项目```### 3. 自定义工作流根据你的项目需求，你可能需要自定义工作流。例如，如果你需要编译多个目标平台，你可以使用`matrix`来并行构建它们：```yamljobs:  build:    runs-on: ubuntu-latest    strategy:      matrix:        target:           - wasm32-unknown-unknown          - x86_64-unknown-linux-musl      fail-fast: false    steps:    - uses: actions/checkout@v2    - name: Install Rust toolchain      uses: actions-rs/toolchain@v1      with:        toolchain: stable        target: ${{ matrix.target }}
-        override: true
-
-    - name: Build project with wasm-pack
-      run: |
-        wasm-pack build --release --target ${{ matrix.target }}```### 4. 提交并推送工作流文件将`build.yml`文件添加到你的GitHub仓库，并推送更改。GitHub Actions将在推送后自动运行工作流。### 5. 查看工作流运行结果在GitHub仓库的`Actions`标签页中，你可以查看工作流的运行状态和结果。如果构建成功，你的Rust/WASM项目将被编译并生成相应的WASM包。### 6. 进一步优化你可以根据需要进一步优化工作流，例如添加测试、格式化检查、代码分析等步骤。GitHub提供了丰富的Actions市场，你可以从中找到许多现成的Actions来扩展你的工作流。通过以上步骤，你可以利用GitHub Actions自动化Rust/WASM项目的编译过程，确保每次代码更改都能生成最新的WASM包。
+          ${{ runner.os }}-cargo-    - name: Create new Rust/WASM project      run: |        cargo install cargo-generate        cargo generate --git https://github.com/rustwasm/wasm-pack-template.git --name my_wasm_project    - name: Build project with wasm-pack      working-directory: ./my_wasm_project      run: |        wasm-pack build --release```这个工作流包含以下步骤：1. **Checkout repository**：检出触发工作流的代码仓库。2. **Install Rust toolchain**：安装Rust工具链和必要的组件，包括`wasm32-unknown-unknown`目标。3. **Cache cargo registry**：缓存`cargo` registry以加快后续构建速度。4. **Create new Rust/WASM project**：使用`cargo-generate`命令从`wasm-pack-template`创建一个新的Rust/WASM项目。5. **Build project with wasm-pack**：进入新创建的项目目录并使用`wasm-pack build`命令进行构建。请注意，这个工作流假设你有一个有效的`GitHub`仓库，并且你希望在每次推送时自动创建和构建一个新的Rust/WASM项目。如果你想要将构建的结果部署到某个地方，你可能需要添加额外的步骤来处理构建输出，例如使用`actions/upload-artifact`上传构建产物或使用其他部署服务。
