@@ -1,10 +1,15 @@
-name: Create and Build Rust WebAssembly Project
+# .github/workflows/build_wasm.yml
 
-on: [push]  # 触发工作流的事件，这里是每次推送到仓库时
+name: Build Rust Wasm
+
+on:
+  push:
+    branches:
+      - main
 
 jobs:
-  create_and_build:
-    runs-on: ubuntu-latest  # 运行工作流的GitHub托管环境
+  build:
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
@@ -15,7 +20,6 @@ jobs:
       with:
         toolchain: stable
         target: wasm32-unknown-unknown
-        components: clippy, rustfmt
         override: true
 
     - name: Cache cargo registry
@@ -27,4 +31,4 @@ jobs:
           ~/.cargo/bin
         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
         restore-keys: |
-          ${{ runner.os }}-cargo-    - name: Create new Rust/WASM project      run: |        cargo install cargo-generate        cargo generate --git https://github.com/rustwasm/wasm-pack-template.git --name my_wasm_project    - name: Build project with wasm-pack      working-directory: ./my_wasm_project      run: |        wasm-pack build --release```这个工作流包含以下步骤：1. **Checkout repository**：检出触发工作流的代码仓库。2. **Install Rust toolchain**：安装Rust工具链和必要的组件，包括`wasm32-unknown-unknown`目标。3. **Cache cargo registry**：缓存`cargo` registry以加快后续构建速度。4. **Create new Rust/WASM project**：使用`cargo-generate`命令从`wasm-pack-template`创建一个新的Rust/WASM项目。5. **Build project with wasm-pack**：进入新创建的项目目录并使用`wasm-pack build`命令进行构建。请注意，这个工作流假设你有一个有效的`GitHub`仓库，并且你希望在每次推送时自动创建和构建一个新的Rust/WASM项目。如果你想要将构建的结果部署到某个地方，你可能需要添加额外的步骤来处理构建输出，例如使用`actions/upload-artifact`上传构建产物或使用其他部署服务。
+          ${{ runner.os }}-cargo-    - name: Create new Rust/WASM project      run: |        cargo install cargo-generate        cargo generate --git https://github.com/rustwasm/wasm-pack-template.git --name my_wasm_project    - name: Build project with wasm-pack      working-directory: ./my_wasm_project      run: |        wasm-pack build --release```现在，您可以将上述YAML配置保存为`build_wasm.yml`，并将其放置在您的GitHub仓库的`.github/workflows`目录中。这将创建一个新的工作流，当您向`main`分支推送时，它会自动运行。接下来，您可以在Markdown文件中引用这个工作流，而不会将代码混合在文本中。例如：```markdown# Rust Wasm Build ProcessThis document describes the process of building a Rust WebAssembly project using GitHub Actions.## GitHub Actions WorkflowThe `build_wasm.yml` workflow automates the creation and building of a new Rust/WASM project based on the `wasm-pack-template`. It installs the necessary Rust toolchain, creates a new project, and builds it for WebAssembly.### Usage1. Add the `build_wasm.yml` file to your `.github/workflows` directory.2. Push your changes to the `main` branch to trigger the workflow.For more information on customizing and extending GitHub Actions workflows, refer to the [official documentation](https://docs.github.com/en/actions/learn-github-actions/introduction-to-github-actions).```这样，您就将GitHub Actions工作流配置与Markdown文档内容清晰地分开了。Markdown文档提供了关于工作流的概述和使用说明，而YAML文件包含了实际的工作流配置。
